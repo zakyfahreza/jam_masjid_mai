@@ -1,0 +1,2235 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masjid Al-Ikhlas Adi Sucipto - Jam Digital</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* Modern Light Theme (Base/V1) */
+            --bg-color: #F0F4F8;
+            --text-color: #333333;
+            --accent-gold: #00897B;
+            /* Green Teal */
+            --accent-gold-dim: #00695C;
+            --highlight-bg: #FFFFFF;
+            --active-prayer-bg: #212121;
+            --active-prayer-text: #FFFFFF;
+            --adhan-bg: #FFFFFF;
+            --adhan-text: #000000;
+        }
+
+        /* Dark Theme Overrides */
+        body.theme-dark {
+            --bg-color: #121212;
+            --text-color: #E0E0E0;
+            --highlight-bg: #1E1E1E;
+            --accent-gold: #00BFA5;
+            /* Brighter Teal for Dark */
+            --accent-gold-dim: #004D40;
+            --active-prayer-bg: #00BFA5;
+            --active-prayer-text: #000000;
+        }
+
+        body.theme-dark #clock {
+            color: #ffffff;
+        }
+
+        body.theme-dark .date-container {
+            color: #aaa;
+        }
+
+        body.theme-dark .subheader {
+            color: #fff;
+        }
+
+        body.theme-dark footer {
+            background: #1E1E1E;
+            color: #fff;
+        }
+
+        body.theme-dark #marquee {
+            color: #fff;
+        }
+
+        body.theme-dark #prayer-strip {
+            background: #1E1E1E;
+            border-top-color: #333;
+        }
+
+        body.theme-dark .prayer-item {
+            border-right-color: #333;
+        }
+
+        body.theme-dark .prayer-name {
+            color: #888;
+        }
+
+        body.theme-dark .prayer-time {
+            color: #eee;
+        }
+
+        body.theme-dark .prayer-item.active .prayer-name {
+            color: #000;
+        }
+
+        body.theme-dark #countdown-wrapper {
+            background: #004D40;
+            border-color: #00BFA5;
+        }
+
+        body.theme-dark.layout-v2 #main-display {
+            background: #1E1E1E;
+            border-color: #00BFA5;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        body.theme-dark.layout-v2 #clock {
+            color: #fff;
+        }
+
+        body.theme-dark.layout-v2 .date-container {
+            color: #ccc;
+        }
+
+        body.theme-dark.layout-v2 .prayer-name {
+            color: #888;
+        }
+
+        body.theme-dark.layout-v2 .prayer-time {
+            color: #fff;
+        }
+
+        body.theme-dark.layout-v2 #prayer-strip {
+            background: #1E1E1E;
+            border-top: 2px solid #00BFA5;
+        }
+
+        body.theme-dark.layout-v2 .prayer-item {
+            border-right: 1px solid #333;
+        }
+
+        body.theme-dark #bg-overlay {
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        /* --- Global Reset & Base --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Roboto', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: all 0.5s ease;
+        }
+
+        #bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.85);
+            /* Light overlay */
+            z-index: -1;
+            transition: background 0.5s;
+        }
+
+        /* --- Header --- */
+        header {
+            text-align: center;
+            padding: 1.5vh 0;
+            border-bottom: 2px solid var(--accent-gold-dim);
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .mosque-logo {
+            height: 15vh;
+            width: auto;
+        }
+
+        .header-text {
+            text-align: left;
+        }
+
+        h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 4vw;
+            color: var(--accent-gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .subheader {
+            font-size: 1.5vw;
+            color: #000;
+            margin-top: 0.5vh;
+        }
+
+        /* --- Layout Containers --- */
+        #content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            /* Default V1 */
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 1;
+        }
+
+        #content-wrapper.fade-out {
+            opacity: 0;
+        }
+
+        /* --- Main Display (Clock) --- */
+        #main-display {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* --- Info Section (Hidden in V1) --- */
+        #info-section {
+            display: none;
+            /* Only for V2 */
+        }
+
+        /* Clock & Date */
+        .time-container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #clock {
+            font-size: 17vw;
+            font-weight: 700;
+            line-height: 1;
+            font-family: 'Oswald', sans-serif;
+            text-shadow: none;
+            /* Clean look */
+            position: relative;
+            display: inline-block;
+            color: #212121;
+            /* Darker text for light bg */
+        }
+
+        #clock .small-sec {
+            font-size: 0.25em;
+            position: absolute;
+            bottom: 0.15em;
+            left: 100%;
+            margin-left: 0.1em;
+            color: #666;
+            /* Subtler grey */
+        }
+
+        .date-container {
+            font-size: 2.2vw;
+            margin-top: 2vh;
+            display: flex;
+            gap: 2vw;
+            justify-content: center;
+            color: #555;
+            /* Darker grey */
+        }
+
+        #countdown-wrapper {
+            margin-top: 2vh;
+            font-size: 2.2vw;
+            /* Adjusted size */
+            color: #fff;
+            /* White Text */
+            font-weight: bold;
+            transition: all 0.5s;
+            background: #00897B;
+            /* Solid Green/Teal */
+            padding: 0.5rem 3rem;
+            border-radius: 50px;
+            border: 3px solid #00695C;
+            /* Accent Border */
+            box-shadow: 0 0 15px rgba(0, 137, 123, 0.4);
+        }
+
+        #countdown-wrapper.large-subuh {
+            font-size: 3.5vw;
+            color: #FF5722;
+            margin-top: 2vh;
+            animation: pulse-slow 3s infinite;
+        }
+
+        /* --- Overlays --- */
+        .fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            background-color: var(--bg-color);
+        }
+
+        .fullscreen-overlay.active {
+            display: flex;
+        }
+
+        #iqomah-overlay {
+            background: rgba(0, 0, 0, 0.95);
+        }
+
+        /* --- Overlay Card Design --- */
+        .overlay-card {
+            background: #fff;
+            border-radius: 40px;
+            border: 4px solid var(--accent-gold);
+            padding: 3rem 5rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            max-width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        /* Decorative Corners (Optional/Simple) */
+        .overlay-card::before,
+        .overlay-card::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--accent-gold);
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+
+        .overlay-card::before {
+            top: -25px;
+            left: -25px;
+        }
+
+        .overlay-card::after {
+            bottom: -25px;
+            right: -25px;
+        }
+
+        .overlay-clock-pill {
+            background: #222;
+            color: #fff;
+            padding: 0.5rem 2rem;
+            border-radius: 50px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 3vw;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .overlay-icon svg {
+            width: 8vw;
+            height: 8vw;
+            fill: #333;
+            margin-bottom: 1rem;
+        }
+
+        .overlay-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            color: var(--accent-gold);
+            opacity: 0.7;
+            margin: 0.5rem 0;
+        }
+
+        .overlay-divider::before,
+        .overlay-divider::after {
+            content: '';
+            height: 2px;
+            flex: 1;
+            background: var(--accent-gold);
+            max-width: 100px;
+        }
+
+        .adhan-title {
+            font-size: 5vw;
+            color: #222;
+            font-weight: bold;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .adhan-name {
+            font-size: 4vw;
+            /* Same size as title for "Adzan Subuh" flow */
+            color: #222;
+            font-family: inherit;
+            /* Match body font or Oswald */
+            font-weight: bold;
+            animation: none;
+            /* Removed pulse for clean look */
+        }
+
+        .overlay-subtitle {
+            font-size: 1.5vw;
+            color: #666;
+            margin-top: 1rem;
+            max-width: 80%;
+            line-height: 1.4;
+            font-style: italic;
+        }
+
+        .iqomah-title {
+            font-size: 4vw;
+            color: #222;
+            font-weight: bold;
+            margin: 0;
+            animation: none;
+        }
+
+        #iqomah-timer {
+            font-size: 14vw;
+            /* Increased from 8vw */
+            font-weight: bold;
+            font-family: 'Oswald', sans-serif;
+            color: #222;
+            line-height: 1;
+            margin: 1rem 0;
+        }
+
+        /* --- Prayer Strip --- */
+        #prayer-strip {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--highlight-bg);
+            padding: 2vh 0;
+            border-top: 2px solid var(--accent-gold);
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+            /* Soft shadow */
+            border-bottom: none;
+            z-index: 1;
+        }
+
+        .prayer-item {
+            text-align: center;
+            flex: 1;
+            padding: 1vh;
+            border-right: 1px solid #eee;
+            transition: all 0.3s;
+        }
+
+        .prayer-item:last-child {
+            border-right: none;
+        }
+
+        .prayer-name {
+            font-size: 1.8vw;
+            text-transform: uppercase;
+            color: #fff;
+            margin-bottom: 0.5vh;
+            font-weight: bold;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .prayer-time {
+            font-size: 4.0vw;
+            font-weight: bold;
+            font-family: 'Oswald', sans-serif;
+            color: #333;
+        }
+
+        .prayer-item.active {
+            background-color: var(--active-prayer-bg);
+            color: var(--active-prayer-text);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .prayer-item.active .prayer-name {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .prayer-item.active .prayer-time {
+            color: #fff;
+        }
+
+        /* --- Running Text --- */
+        footer {
+            background-color: #fff;
+            /* White footer now */
+            color: #333;
+            border-top: 2px solid var(--accent-gold);
+            padding: 1.5vh 0;
+            overflow: hidden;
+            white-space: nowrap;
+            z-index: 1;
+        }
+
+        #marquee {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 20s linear infinite;
+            font-size: 2vw;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* --- Settings UI --- */
+        #settings-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            opacity: 0.2;
+            color: #000;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 200;
+        }
+
+        #settings-btn:hover {
+            opacity: 0.8;
+        }
+
+        #settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .settings-content {
+            background: #222;
+            padding: 2rem;
+            border: 2px solid var(--accent-gold);
+            width: 60%;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #fff;
+        }
+
+        .settings-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--accent-gold);
+        }
+
+        .settings-group input,
+        .settings-group select {
+            width: 100%;
+            padding: 0.5rem;
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
+        .btn-cancel {
+            background: #555;
+            color: #fff;
+        }
+
+        /* ================= LAYOUT V2 (Modern/Green/Split) ================= */
+        body.layout-v2 {
+            --bg-color: #F0F4F8;
+            /* Light BG */
+            --text-color: #333;
+            --accent-gold: #00897B;
+            /* Green Teal */
+            --highlight-bg: #fff;
+            --active-prayer-bg: #111;
+            /* Dark Active */
+            --active-prayer-text: #fff;
+        }
+
+        body.layout-v2 #bg-overlay {
+            background: rgba(255, 255, 255, 0.85);
+            /* Lighter overlay */
+        }
+
+        body.layout-v2 header {
+            display: none;
+            /* Hidden, moved to side */
+        }
+
+        body.layout-v2 #content-wrapper {
+            flex-direction: row;
+            /* Horizontal split */
+            padding: 2vh 2vw;
+            gap: 2vw;
+            align-items: stretch;
+            flex: 1;
+            /* Take available space */
+            margin-bottom: 0;
+            /* Strip is footer-like now */
+        }
+
+        /* V2 Left Side: Clock */
+        body.layout-v2 #main-display {
+            flex: 1;
+            /* 40% width approx */
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            justify-content: center;
+            padding: 2rem;
+            border: 3px solid var(--accent-gold);
+            /* Accent Border */
+        }
+
+        body.layout-v2 #clock {
+            font-size: 13vw;
+            /* Smaller than V1 */
+            color: #333;
+            text-shadow: none;
+        }
+
+        body.layout-v2 #clock .small-sec {
+            color: #888;
+        }
+
+        body.layout-v2 .date-container {
+            color: #555;
+            font-size: 1.5vw;
+        }
+
+        body.layout-v2 #countdown-wrapper {
+            /* Inherit base styles, only adjust margin */
+            margin-top: 2rem;
+            font-size: 1.8vw;
+            /* Smaller for V2 */
+        }
+
+        body.layout-v2 #countdown-wrapper.large-subuh {
+            background: #FF5722;
+            color: #fff;
+        }
+
+        /* V2 Right Side: Info */
+        body.layout-v2 #info-section {
+            flex: 1.5;
+            /* Wider */
+            display: flex;
+            flex-direction: column;
+            gap: 2vh;
+        }
+
+        body.layout-v2 .v2-header-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-bottom: 4px solid #00897B;
+        }
+
+        body.layout-v2 .v2-header-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2.5vw;
+            color: #333;
+            text-transform: uppercase;
+        }
+
+        body.layout-v2 .v2-header-sub {
+            font-size: 1.2vw;
+            color: #666;
+        }
+
+        body.layout-v2 .info-card {
+            flex: 1;
+            background: linear-gradient(135deg, #00BFA5 0%, #00897B 100%);
+            border-radius: 20px;
+            /* Padding removed to let image fill */
+            padding: 0;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(0, 181, 165, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Slideshow Styles */
+        #slideshow-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .slide-img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            /* Fill to ensure no empty space */
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transform: translateZ(0);
+            /* Hardware Acceleration */
+            will-change: opacity;
+            transition: opacity 1s ease-in-out;
+            z-index: 1;
+        }
+
+        .slide-img.active {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        /* Legacy Imam Grid (Hidden if slideshow active) */
+        .imam-grid-container {
+            padding: 2rem;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Pattern decorative */
+        body.layout-v2 .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIiBvcGFjaXR5PSIwLjEiPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik0yMCAyMGwxMCAxMC0xMCAxMC0xMC0xMCAxMC0xMHptMC0yMGwxMCAxMC0xMCAxMC0xMC0xMCAxMC0xMHoiLz48L3N2Zz4=');
+            opacity: 0.1;
+        }
+
+        body.layout-v2 .info-title {
+            font-size: 2vw;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 2;
+        }
+
+        body.layout-v2 .imam-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            width: 100%;
+            z-index: 2;
+        }
+
+        body.layout-v2 .imam-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        body.layout-v2 .imam-label {
+            font-size: 0.9vw;
+            opacity: 0.9;
+            text-transform: uppercase;
+        }
+
+        body.layout-v2 .imam-name {
+            font-size: 1.3vw;
+            font-weight: bold;
+            margin-top: 0.2rem;
+        }
+
+        /* V2 Prayer Strip (Reverted to match V1) */
+        body.layout-v2 #prayer-strip {
+            background-color: var(--highlight-bg);
+            border-top: 2px solid var(--accent-gold);
+            padding: 2vh 0;
+            gap: 0;
+            width: 100%;
+            /* Ensure it spans full width if inside flex container */
+            margin-top: auto;
+        }
+
+        body.layout-v2 .prayer-item {
+            background: transparent;
+            border-radius: 0;
+            border-right: 1px solid #eee;
+            /* Restore dividers */
+            box-shadow: none;
+            color: var(--text-color);
+        }
+
+        body.layout-v2 .prayer-name {
+            color: #666;
+        }
+
+        body.layout-v2 .prayer-item.active {
+            background-color: var(--active-prayer-bg);
+            color: var(--active-prayer-text);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            z-index: 10;
+        }
+
+        body.layout-v2 .prayer-item.active .prayer-name {
+            color: #FFD700;
+        }
+
+        body.layout-v2 footer {
+            background: #fff;
+            color: #333;
+            border-top: none;
+        }
+
+        body.layout-v2 #marquee {
+            color: #333;
+            font-weight: bold;
+        }
+
+        body.layout-v2 #settings-btn {
+            color: #333;
+            opacity: 0.2;
+        }
+
+
+        @keyframes marquee {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(-100%, 0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse-slow {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="bg-overlay"></div>
+    <audio id="alarm-sound" src="sounds/beep.mp3" preload="auto"></audio>
+    <div id="settings-btn" onclick="openSettings()">⚙️</div>
+
+    <header> <!-- V1 Header -->
+        <img src="images/logo_masjid.png" class="mosque-logo" alt="Logo">
+        <div class="header-text">
+            <h1>Masjid Al-Ikhlas Adi Sucipto</h1>
+            <div class="subheader">Jl. Adi Sucipto, No. 88b, Surakarta</div>
+        </div>
+    </header>
+
+    <div id="content-wrapper">
+        <div id="main-display">
+            <!-- Normal Clock -->
+            <div id="clock-container" class="time-container">
+                <!-- V2 Date moves inside here via CSS flow, no html change needed mostly -->
+                <div class="date-container">
+                    <span id="gregorian-date">Senin, 1 Januari 2024</span>
+                    <span style="color:var(--accent-gold)">|</span>
+                    <span id="hijri-date">1 Rajab 1445 H</span>
+                </div>
+                <div id="clock">00:00:00</div>
+                <div id="countdown-wrapper" class="next-prayer-countdown">Menuju Subuh: -02:30:00</div>
+            </div>
+        </div>
+
+        <!-- Info Section (V2 Only) -->
+        <div id="info-section">
+            <div class="v2-header-card"
+                style="display:flex; align-items:center; justify-content:center; gap:15px; text-align:left;">
+                <img src="images/logo_masjid.png" style="height:9vh; width:auto;" alt="Logo">
+                <div>
+                    <div class="v2-header-title">Masjid Al-Ikhlas Adi Sucipto</div>
+                    <div class="v2-header-sub">Jl. Adi Sucipto, No. 88b, Surakarta</div>
+                </div>
+            </div>
+
+            <div class="info-card" id="info-card-content">
+                <!-- Content injected via JS: Slideshow OR Imam Grid -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlays -->
+    <!-- Syuruq Overlay (20 Menit setelah Syuruq) -->
+    <div id="syuruq-overlay" class="fullscreen-overlay" style="background: rgba(255, 248, 220, 0.97);">
+        <div class="overlay-card" style="border-color: #F59E0B;">
+            <div class="overlay-icon">
+                <svg viewBox="0 0 24 24" style="fill:#F59E0B;">
+                    <path
+                        d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,6.65C6.9,7.16 6.36,7.78 5.94,8.5C5.5,9.24 5.25,10 5.11,10.79L3.34,7M3.36,17L5.12,13.23C5.26,14 5.5,14.77 5.93,15.5C6.36,16.21 6.89,16.83 7.5,17.34L3.36,17M20.65,7L18.88,10.79C18.74,10 18.5,9.23 18.07,8.5C17.64,7.78 17.1,7.15 16.5,6.64L20.65,7M20.64,17L16.5,17.36C17.11,16.85 17.64,16.22 18.07,15.5C18.5,14.77 18.75,14 18.88,13.21L20.64,17M12,22L9.59,18.56C10.33,18.83 11.14,19 12,19C12.82,19 13.63,18.83 14.37,18.56L12,22Z" />
+                </svg>
+            </div>
+            <div class="overlay-clock-pill" style="background:#F59E0B;">
+                <span>🌅</span> <span id="syuruq-clock">00:00:00</span>
+            </div>
+            <div class="overlay-divider" style="color:#F59E0B;">♦</div>
+            <div class="adhan-title" style="color:#92400E;">Waktu Syuruq</div>
+            <div id="syuruq-name-display" class="adhan-name" style="color:#B45309; font-size:3vw;"></div>
+            <div class="overlay-subtitle">
+                "Barang siapa shalat Subuh berjamaah kemudian duduk berdzikir hingga matahari terbit, lalu shalat dua
+                rakaat, maka baginya seperti pahala haji dan umroh." - HR. Tirmidzi
+            </div>
+        </div>
+    </div>
+    <!-- Overlays -->
+    <div id="adhan-overlay" class="fullscreen-overlay" style="background: rgba(240, 244, 248, 0.95);">
+        <div class="overlay-card">
+            <div class="overlay-icon">
+                <!-- Mosque Icon SVG -->
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" />
+                </svg>
+            </div>
+
+            <div class="overlay-clock-pill">
+                <span>🕒</span> <span id="adhan-clock">00:00:00</span>
+            </div>
+
+            <div class="overlay-divider">♦</div>
+
+            <div>
+                <div class="adhan-title">Saatnya Adzan <span id="adhan-name-display" class="adhan-name">DZUHUR</span>
+                </div>
+            </div>
+
+            <div class="overlay-subtitle">
+                "Salat berjamaah itu lebih utama daripada salat sendiri sebanyak 27 derajat." - HR. Bukhari
+            </div>
+        </div>
+    </div>
+
+    <div id="iqomah-overlay" class="fullscreen-overlay" style="background: rgba(240, 244, 248, 0.95);">
+        <div class="overlay-card">
+            <div class="overlay-clock-pill">
+                <span>🕒</span> <span id="iqomah-clock">00:00:00</span>
+            </div>
+
+            <div id="iqomah-timer"
+                style="font-size: 14vw; font-weight: bold; font-family: 'Oswald', sans-serif; color: #222; line-height: 1; margin: 1rem 0;">
+                -10:00</div>
+
+            <div class="overlay-divider">♦</div>
+
+            <div class="iqomah-title">Menjelang Iqomah</div>
+
+            <div class="overlay-subtitle">
+                Para jamaah mohon untuk bersiap, dan alat komunikasi mohon dalam mode senyap, terima kasih.
+            </div>
+        </div>
+    </div>
+
+    <!-- Sholat Overlay (Post-Iqomah) -->
+    <div id="sholat-overlay" class="fullscreen-overlay" style="background: rgba(240, 244, 248, 0.95);">
+        <div class="overlay-card">
+            <div class="overlay-icon">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" />
+                </svg>
+            </div>
+            <div class="overlay-clock-pill">
+                <span>🕒</span> <span id="sholat-clock">00:00:00</span>
+            </div>
+
+            <div class="adhan-title" style="margin-top:1rem;">Iqomah</div>
+            <div class="overlay-divider">♦</div>
+            <div class="overlay-subtitle">
+                "Luruskan shaf-shaf kalian, karena sesungguhnya lurusnya shaf termasuk kesempurnaan sholat." - HR.
+                Bukhari
+            </div>
+        </div>
+    </div>
+
+    <div id="prayer-strip">
+        <div class="prayer-item" id="p-subuh">
+            <div class="prayer-name">Subuh</div>
+            <div class="prayer-time">04:00</div>
+        </div>
+        <div class="prayer-item" id="p-syuruq">
+            <div class="prayer-name">Syuruq</div>
+            <div class="prayer-time">05:38</div>
+        </div>
+        <div class="prayer-item" id="p-dzuhur">
+            <div class="prayer-name">Dzuhur</div>
+            <div class="prayer-time">11:30</div>
+        </div>
+        <div class="prayer-item" id="p-ashar">
+            <div class="prayer-name">Ashar</div>
+            <div class="prayer-time">14:45</div>
+        </div>
+        <div class="prayer-item" id="p-maghrib">
+            <div class="prayer-name">Maghrib</div>
+            <div class="prayer-time">17:45</div>
+        </div>
+        <div class="prayer-item" id="p-isya">
+            <div class="prayer-name">Isya</div>
+            <div class="prayer-time">19:00</div>
+        </div>
+    </div>
+
+    <footer>
+        <div id="marquee">Mohon jamaah menonaktifkan atau mensilent HP sebelum shalat dimulai. Luruskan dan rapatkan
+            shaf, sempurnakan shalat kita. Mari salurkan donasi operasional masjid melalui Rekening BSI 7313-9221-24
+            a.n. Kemuslimahan Masjid Al-Ikhlas Jajar. Jazakumullahu khairan.</div>
+    </footer>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal">
+        <div class="settings-content">
+            <h2 style="color:var(--accent-gold); margin-bottom:1rem;">Pengaturan</h2>
+
+            <div class="settings-group">
+                <label>Tema Warna (Background)</label>
+                <select id="cfg-theme">
+                    <option value="light">Light Mode (Putih/Hijau)</option>
+                    <option value="dark">Dark Mode (Hitam/Hijau)</option>
+                </select>
+            </div>
+
+            <div class="settings-group">
+                <label>Lokasi (Kota)</label>
+                <select id="cfg-city" onchange="checkCityInput()">
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+
+            <div id="manual-coords-group"
+                style="display:none; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:1.5rem;">
+                <div class="settings-group">
+                    <label>Latitude</label>
+                    <input type="number" id="cfg-lat" step="any">
+                </div>
+                <div class="settings-group">
+                    <label>Longitude</label>
+                    <input type="number" id="cfg-lng" step="any">
+                </div>
+                <div class="settings-group">
+                    <label>Zona Waktu (7=WIB, 8=WITA)</label>
+                    <input type="number" id="cfg-tz" step="1">
+                </div>
+            </div>
+
+            <div class="settings-group">
+
+                <div class="settings-group">
+                    <label>Tampilan (Layout)</label>
+                    <select id="cfg-layout">
+                        <option value="v1">Layout 1 (Modern Centered)</option>
+                        <option value="v2">Layout 2 (Modern Split)</option>
+                    </select>
+                    <div style="margin-top:5px; display:flex; align-items:center;">
+                        <input type="checkbox" id="cfg-auto-layout" style="width:auto; margin-right:10px;">
+                        <label style="margin:0; font-size:0.9em; color:#ccc;">Auto Ganti Layout (Tiap 15 Menit)</label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <label>Lokasi File Background (contoh: images/bg.jpg)</label>
+                    <input type="text" id="cfg-bg-url" placeholder="images/background.png">
+                </div>
+
+                <div class="settings-group" style="display:flex; align-items:center;">
+                    <input type="checkbox" id="cfg-sound-enabled" style="width:auto; margin-right:10px;">
+                    <label style="margin:0; color:#fff;">Mainkan Suara Beep (Adzan & Iqomah)</label>
+                </div>
+
+                <hr style="border:0; border-top:1px solid #444; margin: 1.5rem 0;">
+
+                <h3 style="color:var(--accent-gold); margin-bottom:0.5rem;">Slideshow Info (Layout 2)</h3>
+                <div class="settings-group" style="display:flex; align-items:center;">
+                    <input type="checkbox" id="cfg-slideshow-enabled" style="width:auto; margin-right:10px;">
+                    <label style="margin:0; color:#fff;">Aktifkan Slideshow</label>
+                </div>
+                <div class="settings-group">
+                    <label>Ganti Gambar Setiap (Menit)</label>
+                    <input type="number" id="cfg-slideshow-interval" min="0.1" step="0.1" placeholder="5">
+                </div>
+                <div class="settings-group">
+                    <label>Daftar Gambar (Satu URL per baris)</label>
+                    <textarea id="cfg-slideshow-list"
+                        style="width:100%; height:100px; background:#333; color:#fff; border:1px solid #555; padding:0.5rem;"
+                        placeholder="slides/slide2.png&#10;slides/slide3.png&#10;slides/slide4.png&#10;slides/slide5.png"></textarea>
+                </div>
+
+                <hr style="border:0; border-top:1px solid #444; margin: 1.5rem 0;">
+
+                <h3 style="margin-bottom:0.5rem; border-bottom:1px solid #444;">Jeda Iqomah (Menit)</h3>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="settings-group"><label>Subuh</label><input type="number" id="cfg-iq-subuh"></div>
+                    <div class="settings-group"><label>Dzuhur</label><input type="number" id="cfg-iq-dzuhur"></div>
+                    <div class="settings-group"><label>Ashar</label><input type="number" id="cfg-iq-ashar"></div>
+                    <div class="settings-group"><label>Maghrib</label><input type="number" id="cfg-iq-maghrib"></div>
+                    <div class="settings-group"><label>Isya</label><input type="number" id="cfg-iq-isya"></div>
+                </div>
+
+                <div class="settings-group">
+                    <label>Running Text (Info)</label>
+                    <input type="text" id="cfg-marquee">
+                </div>
+
+                <div class="settings-group">
+                    <label>Kecepatan Running Text (Detik - Semakin besar semakin lambat)</label>
+                    <input type="number" id="cfg-marquee-speed" min="5" value="20">
+                </div>
+
+                <hr style="border:0; border-top:1px solid #444; margin: 1.5rem 0;">
+
+                <h3 style="color:var(--accent-gold); margin-bottom:0.5rem;">Simulasi (Test Tampilan)</h3>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn" onclick="testAdhan()">Test Adzan</button>
+                    <button class="btn" onclick="testIqomah()">Test Iqomah</button>
+                    <button class="btn btn-cancel" onclick="location.reload()">Reset / Stop</button>
+                </div>
+
+                <div class="settings-group">
+                    <label>Koreksi Tanggal Hijriah (Hari, misal: -1, 0, +1)</label>
+                    <input type="number" id="cfg-hijri-offset" value="1">
+                </div>
+
+                <div style="margin-top:2rem; text-align:right;">
+                    <button class="btn" style="background:#555; float:left;" onclick="toggleFullScreen()">🖥️ Full
+                        Screen</button>
+                    <button class="btn btn-cancel" onclick="closeSettings()">Batal</button>
+                    <button class="btn" onclick="saveSettings()">Simpan</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="wtimes-ID.KOTA_SURAKARTA.js"></script>
+        <script>
+            // --- PrayTimes.js Wrapper (Inlined) ---
+            /* PrayTimes.js: Prayer Times Calculator (ver 2.3) */
+            function PrayTimes(method) {
+                var timeNames = { imsak: 'Imsak', fajr: 'Fajr', sunrise: 'Sunrise', dhuhr: 'Dhuhr', asr: 'Asr', sunset: 'Sunset', maghrib: 'Maghrib', isha: 'Isha', midnight: 'Midnight' };
+                var methods = {
+                    MWL: { name: 'Muslim World League', params: { fajr: 18, isha: 17 } },
+                    ISNA: { name: 'Islamic Society of North America (ISNA)', params: { fajr: 15, isha: 15 } },
+                    Egypt: { name: 'Egyptian General Authority of Survey', params: { fajr: 19.5, isha: 17.5 } },
+                    Makkah: { name: 'Umm Al-Qura University, Makkah', params: { fajr: 18.5, isha: '90 min' } },
+                    Karachi: { name: 'University of Islamic Sciences, Karachi', params: { fajr: 18, isha: 18 } },
+                    Tehran: { name: 'Institute of Geophysics, University of Tehran', params: { fajr: 17.7, isha: 14, maghrib: 4.5, midnight: 'Jafari' } },
+                    Jafari: { name: 'Shia Ithna-Ashari, Leva Institute, Qum', params: { fajr: 16, isha: 14, maghrib: 4, midnight: 'Jafari' } },
+                    Indonesia: { name: 'Kemenag RI', params: { fajr: 20, isha: 18, maghrib: '0 min', dhuhr: '2 min' } } // Kemenag Standar
+                };
+                var defaultParams = { maghrib: '0 min', midnight: 'Standard' };
+                var calcMethod = 'MWL';
+                var setting = { imsak: '10 min', dhuhr: '0 min', asr: 'Standard', highLats: 'NightMiddle' };
+                var timeFormat = '24h';
+                var timeSuffixes = ['am', 'pm'];
+                var invalidTime = '-----';
+                var numIterations = 1;
+                var offset = {};
+                var lat, lng, elv, timeZone, jDate;
+
+                var defParams = defaultParams;
+                for (var i in methods) {
+                    var params = methods[i].params;
+                    for (var j in defParams) if ((typeof (params[j]) == 'undefined')) params[j] = defParams[j];
+                };
+
+                calcMethod = methods[method] ? method : calcMethod;
+                var params = methods[calcMethod].params;
+                for (var id in params) setting[id] = params[id];
+
+                for (var i in timeNames) offset[i] = 0;
+
+                return {
+                    setMethod: function (method) { if (methods[method]) { this.adjust(methods[method].params); calcMethod = method; } },
+                    adjust: function (params) { for (var id in params) setting[id] = params[id]; },
+                    tune: function (timeOffsets) { for (var i in timeOffsets) offset[i] = timeOffsets[i]; },
+                    getMethod: function () { return calcMethod; },
+                    getSetting: function () { return setting; },
+                    getOffsets: function () { return offset; },
+                    getDefaults: function () { return methods; },
+                    getTimes: function (date, coords, timezone, dst, format) {
+                        lat = 1 * coords[0]; lng = 1 * coords[1]; elv = coords[2] ? 1 * coords[2] : 0;
+                        timeFormat = format || timeFormat;
+                        if (date.constructor === Date) date = [date.getFullYear(), date.getMonth() + 1, date.getDate()];
+                        if (typeof (timezone) == 'undefined' || timezone == 'auto') timezone = this.getTimeZone(date);
+                        if (typeof (dst) == 'undefined' || dst == 'auto') dst = this.getDst(date);
+                        timeZone = 1 * timezone + (1 * dst ? 1 : 0);
+                        jDate = this.julian(date[0], date[1], date[2]) - lng / (15 * 24);
+                        return this.computeTimes();
+                    },
+                    getFormattedTime: function (time, format, suffixes) {
+                        if (isNaN(time)) return invalidTime;
+                        if (format == 'Float') return time;
+                        suffixes = suffixes || timeSuffixes;
+                        time = DMath.fixHour(time + 0.5 / 60);
+                        var hours = Math.floor(time);
+                        var minutes = Math.floor((time - hours) * 60);
+                        var suffix = (format == '12h') ? suffixes[hours < 12 ? 0 : 1] : '';
+                        var hour = (format == '24h') ? this.twoDigitsFormat(hours) : ((hours + 12 - 1) % 12 + 1);
+                        return hour + ':' + this.twoDigitsFormat(minutes) + (suffix ? ' ' + suffix : '');
+                    },
+                    midDay: function (time) { var eqt = this.sunPosition(jDate + time).equation; var noon = DMath.fixHour(12 - eqt); return noon; },
+                    sunAngleTime: function (angle, time, direction) { var decl = this.sunPosition(jDate + time).declination; var noon = this.midDay(time); var t = 1 / 15 * DMath.arccos((-DMath.sin(angle) - DMath.sin(decl) * DMath.sin(lat)) / (DMath.cos(decl) * DMath.cos(lat))); return noon + (direction == 'ccw' ? -t : t); },
+                    asrTime: function (factor, time) { var decl = this.sunPosition(jDate + time).declination; var angle = -DMath.arccot(factor + DMath.tan(Math.abs(lat - decl))); return this.sunAngleTime(angle, time); },
+                    sunPosition: function (jd) { var D = jd - 2451545.0; var g = DMath.fixAngle(357.529 + 0.98560028 * D); var q = DMath.fixAngle(280.459 + 0.98564736 * D); var L = DMath.fixAngle(q + 1.915 * DMath.sin(g) + 0.020 * DMath.sin(2 * g)); var R = 1.00014 - 0.01671 * DMath.cos(g) - 0.00014 * DMath.cos(2 * g); var e = 23.439 - 0.00000036 * D; var RA = DMath.arctan2(DMath.cos(e) * DMath.sin(L), DMath.cos(L)) / 15; var eqt = q / 15 - DMath.fixHour(RA); var decl = DMath.arcsin(DMath.sin(e) * DMath.sin(L)); return { declination: decl, equation: eqt }; },
+                    julian: function (year, month, day) { if (month <= 2) { year -= 1; month += 12; }; var A = Math.floor(year / 100); var B = 2 - A + Math.floor(A / 4); var JD = Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5; return JD; },
+                    computePrayerTimes: function (times) { times = this.dayPortion(times); var params = setting; var imsak = this.sunAngleTime(this.value(params.imsak), times.imsak, 'ccw'); var fajr = this.sunAngleTime(this.value(params.fajr), times.fajr, 'ccw'); var sunrise = this.sunAngleTime(this.riseSetAngle(), times.sunrise, 'ccw'); var dhuhr = this.midDay(times.dhuhr); var asr = this.asrTime(this.asrFactor(params.asr), times.asr); var sunset = this.sunAngleTime(this.riseSetAngle(), times.sunset);; var maghrib = this.sunAngleTime(this.value(params.maghrib), times.maghrib); var isha = this.sunAngleTime(this.value(params.isha), times.isha); return { imsak: imsak, fajr: fajr, sunrise: sunrise, dhuhr: dhuhr, asr: asr, sunset: sunset, maghrib: maghrib, isha: isha }; },
+                    computeTimes: function () { var times = { imsak: 5, fajr: 5, sunrise: 6, dhuhr: 12, asr: 13, sunset: 18, maghrib: 18, isha: 18 }; for (var i = 1; i <= numIterations; i++) times = this.computePrayerTimes(times); times = this.adjustTimes(times); times.midnight = (setting.midnight == 'Jafari') ? times.sunset + this.timeDiff(times.sunset, times.fajr + 24) / 2 : times.sunset + this.timeDiff(times.sunset, times.sunrise + 24) / 2; times = this.tuneTimes(times); return this.modifyFormats(times); },
+                    adjustTimes: function (times) { var params = setting; for (var i in times) times[i] += timeZone - lng / 15; if (params.highLats != 'None') times = this.adjustHighLats(times); if (this.isMin(params.imsak)) times.imsak = times.fajr - this.value(params.imsak) / 60; if (this.isMin(params.maghrib)) times.maghrib = times.sunset + this.value(params.maghrib) / 60; if (this.isMin(params.isha)) times.isha = times.maghrib + this.value(params.isha) / 60; times.dhuhr += this.value(params.dhuhr) / 60; return times; },
+                    asrFactor: function (asrParam) { var factor = { Standard: 1, Hanafi: 2 }[asrParam]; return factor || this.value(asrParam); },
+                    riseSetAngle: function () { var angle = 0.0347 * Math.sqrt(elv); return 0.833 + angle; },
+                    tuneTimes: function (times) { for (var i in times) times[i] += offset[i] / 60; return times; },
+                    modifyFormats: function (times) { for (var i in times) times[i] = this.getFormattedTime(times[i], timeFormat); return times; },
+                    adjustHighLats: function (times) { var params = setting; var nightTime = this.timeDiff(times.sunset, times.sunrise); times.imsak = this.adjustHLTime(times.imsak, times.sunrise, this.value(params.imsak), nightTime, 'ccw'); times.fajr = this.adjustHLTime(times.fajr, times.sunrise, this.value(params.fajr), nightTime, 'ccw'); times.isha = this.adjustHLTime(times.isha, times.sunset, this.value(params.isha), nightTime); times.maghrib = this.adjustHLTime(times.maghrib, times.sunset, this.value(params.maghrib), nightTime); return times; },
+                    adjustHLTime: function (time, base, angle, night, direction) { var portion = this.nightPortion(angle, night); var timeDiff = (direction == 'ccw') ? this.timeDiff(time, base) : this.timeDiff(base, time); if (isNaN(time) || timeDiff > portion) time = base + (direction == 'ccw' ? -portion : portion); return time; },
+                    nightPortion: function (angle, night) { var method = setting.highLats; var portion = 1 / 2; if (method == 'AngleBased') portion = 1 / 60 * angle; if (method == 'OneSeventh') portion = 1 / 7; return portion * night; },
+                    dayPortion: function (times) { for (var i in times) times[i] /= 24; return times; },
+                    getTimeZone: function (date) { var year = date[0]; var t1 = this.gmtOffset([year, 0, 1]); var t2 = this.gmtOffset([year, 6, 1]); return Math.min(t1, t2); },
+                    getDst: function (date) { return 1 * (this.gmtOffset(date) != this.getTimeZone(date)); },
+                    gmtOffset: function (date) { var localDate = new Date(date[0], date[1] - 1, date[2], 12, 0, 0, 0); var GMTString = localDate.toGMTString(); var GMTDate = new Date(GMTString.substring(0, GMTString.lastIndexOf(' ') - 1)); var hoursDiff = (localDate - GMTDate) / (1000 * 60 * 60); return hoursDiff; },
+                    value: function (str) { return 1 * (str + '').split(/[^0-9.+-]/)[0]; },
+                    isMin: function (arg) { return (arg + '').indexOf('min') != -1; },
+                    timeDiff: function (time1, time2) { return DMath.fixHour(time2 - time1); },
+                    twoDigitsFormat: function (num) { return (num < 10) ? '0' + num : num; }
+                }
+            }
+            var DMath = { dtr: function (d) { return (d * Math.PI) / 180.0; }, rtd: function (r) { return (r * 180.0) / Math.PI; }, sin: function (d) { return Math.sin(this.dtr(d)); }, cos: function (d) { return Math.cos(this.dtr(d)); }, tan: function (d) { return Math.tan(this.dtr(d)); }, arcsin: function (d) { return this.rtd(Math.asin(d)); }, arccos: function (d) { return this.rtd(Math.acos(d)); }, arctan: function (d) { return this.rtd(Math.atan(d)); }, arccot: function (x) { return this.rtd(Math.atan(1 / x)); }, arctan2: function (y, x) { return this.rtd(Math.atan2(y, x)); }, fixAngle: function (a) { return this.fix(a, 360); }, fixHour: function (a) { return this.fix(a, 24); }, fix: function (a, b) { a = a - b * Math.floor(a / b); return (a < 0) ? a + b : a; } };
+
+            // --- Application Logic ---
+
+            const INDONESIAN_CITIES = {
+                'jakarta': { name: 'Jakarta', lat: -6.2088, lng: 106.8456, tz: 7 },
+                'solo': { name: 'Solo (Surakarta)', lat: -7.5561, lng: 110.8317, tz: 7 },
+                'surabaya': { name: 'Surabaya', lat: -7.2575, lng: 112.7521, tz: 7 },
+                'bandung': { name: 'Bandung', lat: -6.9175, lng: 107.6191, tz: 7 },
+                'semarang': { name: 'Semarang', lat: -6.9667, lng: 110.4167, tz: 7 },
+                'yogyakarta': { name: 'Yogyakarta', lat: -7.7956, lng: 110.3695, tz: 7 },
+                'medan': { name: 'Medan', lat: 3.5952, lng: 98.6722, tz: 7 },
+                'makassar': { name: 'Makassar', lat: -5.1476, lng: 119.4327, tz: 8 }, // WITA
+                'denpasar': { name: 'Denpasar', lat: -8.6705, lng: 115.2126, tz: 8 }, // WITA
+                'jayapura': { name: 'Jayapura', lat: -2.5489, lng: 140.7112, tz: 9 }, // WIT
+                'auto': { name: '📍 Deteksi Lokasi Otomatis (GPS)', lat: null, lng: null, tz: 7 },
+                'manual': { name: '✏️ Input Koordinat Manual', lat: null, lng: null, tz: 7 }
+            };
+
+            // Default Config
+
+            // Default Config
+            const DEFAULT_CONFIG = {
+                layout: 'v1', // 'v1' or 'v2'
+                cityId: 'solo', // Default City Key
+                lat: -7.5561, // Solo
+                lng: 110.8317,
+                elevation: 0,
+                timeZone: 7,
+                method: 'Indonesia', // Default Kemenag
+                bgUrl: 'images/background.png',
+                soundEnabled: true,
+                autoLayoutSwitch: false, // New Config
+                marqueeText: 'Mohon jamaah menonaktifkan atau mensilent HP sebelum shalat dimulai. Luruskan dan rapatkan shaf, sempurnakan shalat kita. Mari salurkan donasi operasional masjid melalui Rekening BSI 7313-9221-24 a.n. Kemuslimahan Masjid Al-Ikhlas Jajar. Jazakumullahu khairan.',
+                marqueeSpeed: 80, // Seconds
+                adhanDisplaySec: 10, // Seconds to show ADHAN overlay
+                syuruqDisplayMin: 20, // Minutes to show Syuruq overlay
+                iqomahDurations: {
+                    subuh: 20, dzuhur: 20, ashar: 20, maghrib: 17, isya: 20
+                },
+                slideshowEnabled: true,
+                slideshowInterval: 1, // Minutes
+                slideshowImages: [
+                    'slides/slide1.png',
+                    'slides/slide2.png',
+                    'slides/slide3.png',
+                    'slides/slide4.png',
+                    'slides/slide5.png'
+                ],
+                ihtiyati: 0, // Data Solo sudah akurat dari Kemenag, tidak perlu offset tambahan
+                hijriOffset: 1, // +1 untuk penyesuaian kalender Ramadhan
+                theme: 'light' // light or dark
+            };
+
+            let CONFIG = { ...DEFAULT_CONFIG };
+            let appMode = 'CLOCK'; // CLOCK, ADHAN, IQOMAH, SHOLAT, SYURUQ
+            let isSimulation = false; // Flag to prevent main loop override
+            let alarmTimeout = null; // Store timeout ID for audio loop
+            let alarmRunId = 0; // Unique ID for each playback sequence
+            let slideIntervalId = null;
+            let layoutIntervalId = null; // Auto Layout Interval
+            let iqomahCountdownInterval = null; // Interval for live iqomah countdown
+            let currentSlideIndex = 0;
+            let wakeLock = null; // Wake Lock Sentinel
+            let audioCtx = null; // Web Audio API context for STB fallback
+
+            // Unlock AudioContext on first user interaction (required for STB/Android)
+            function unlockAudio() {
+                if (!audioCtx) {
+                    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { }
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const audio = document.getElementById('alarm-sound');
+                if (audio) {
+                    audio.load();
+                    // Play briefly and pause to unlock
+                    var p = audio.play();
+                    if (p) p.then(function () { audio.pause(); audio.currentTime = 0; }).catch(function () { });
+                }
+            }
+            document.addEventListener('click', unlockAudio, { once: false });
+            document.addEventListener('touchstart', unlockAudio, { once: false });
+
+            // Preload V1 background image to avoid load failure on display
+            function preloadBgImage(url) {
+                if (!url || url.trim() === '') return;
+                var img = new Image();
+                img.onload = function () {
+                    document.body.style.backgroundImage = 'url("' + url + '")';
+                };
+                img.onerror = function () {
+                    console.warn('Background image failed to load:', url);
+                };
+                img.src = url;
+            }
+
+            function loadSettings() {
+                const saved = localStorage.getItem('masjidConfig');
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        CONFIG = { ...CONFIG, ...parsed, iqomahDurations: { ...CONFIG.iqomahDurations, ...(parsed.iqomahDurations || {}) } };
+
+                        // Migrasi: Jika kota Solo dan ihtiyati masih nilai default lama (2),
+                        // reset ke 0 karena data Solo sudah akurat tanpa offset tambahan
+                        if (CONFIG.cityId === 'solo' && CONFIG.ihtiyati === 2) {
+                            CONFIG.ihtiyati = 0;
+                        }
+                        // Pastikan syuruqDisplayMin ada
+                        if (!CONFIG.syuruqDisplayMin) CONFIG.syuruqDisplayMin = 20;
+                    } catch (e) { console.error('Error loading settings', e); }
+                }
+                applySettings();
+            }
+
+            function saveSettings() {
+                // City Logic
+                const cityId = document.getElementById('cfg-city').value;
+                CONFIG.cityId = cityId;
+                const cityData = INDONESIAN_CITIES[cityId];
+                if (cityId === 'manual') {
+                    CONFIG.lat = parseFloat(document.getElementById('cfg-lat').value) || CONFIG.lat;
+                    CONFIG.lng = parseFloat(document.getElementById('cfg-lng').value) || CONFIG.lng;
+                    CONFIG.timeZone = parseFloat(document.getElementById('cfg-tz').value) || CONFIG.timeZone;
+                } else if (cityId === 'auto') {
+                    // Coordinates already set by geolocation logic, just ensure timezone is correct?
+                    // Usually we keep existing or rely on getUserLocation update
+                    // But for save, we might want to respect the manual override if user tweaked it
+                } else if (cityData) {
+                    CONFIG.lat = cityData.lat;
+                    CONFIG.lng = cityData.lng;
+                    CONFIG.timeZone = cityData.tz;
+                }
+
+                CONFIG.theme = document.getElementById('cfg-theme').value;
+                CONFIG.layout = document.getElementById('cfg-layout').value;
+                CONFIG.autoLayoutSwitch = document.getElementById('cfg-auto-layout').checked;
+                CONFIG.bgUrl = document.getElementById('cfg-bg-url').value;
+                CONFIG.slideshowEnabled = document.getElementById('cfg-slideshow-enabled').checked;
+                const slideIntervalVal = parseFloat(document.getElementById('cfg-slideshow-interval').value);
+                CONFIG.slideshowInterval = isNaN(slideIntervalVal) ? 1 : slideIntervalVal;
+
+                const slideText = document.getElementById('cfg-slideshow-list').value;
+                CONFIG.slideshowImages = slideText.split('\n').map(s => s.trim()).filter(s => s !== '');
+
+                CONFIG.marqueeText = document.getElementById('cfg-marquee').value;
+                CONFIG.marqueeSpeed = parseInt(document.getElementById('cfg-marquee-speed').value) || 20;
+                CONFIG.hijriOffset = parseInt(document.getElementById('cfg-hijri-offset').value) || 0;
+                CONFIG.iqomahDurations.subuh = parseInt(document.getElementById('cfg-iq-subuh').value) || 15;
+                CONFIG.iqomahDurations.dzuhur = parseInt(document.getElementById('cfg-iq-dzuhur').value) || 10;
+                CONFIG.iqomahDurations.ashar = parseInt(document.getElementById('cfg-iq-ashar').value) || 10;
+                CONFIG.iqomahDurations.maghrib = parseInt(document.getElementById('cfg-iq-maghrib').value) || 10;
+                CONFIG.iqomahDurations.isya = parseInt(document.getElementById('cfg-iq-isya').value) || 10;
+
+                localStorage.setItem('masjidConfig', JSON.stringify(CONFIG));
+                closeSettings();
+                applySettings();
+
+                // If Auto, trigger re-detect
+                if (CONFIG.cityId === 'auto') getUserLocation();
+
+                calculatePrayerTimes(); // Refresh times with new location
+                updateClock(); // Refresh display
+                // Handle Auto Layout Switcher
+                resetAutoLayoutTimer();
+            }
+
+            function resetAutoLayoutTimer() {
+                if (layoutIntervalId) clearInterval(layoutIntervalId);
+                layoutIntervalId = null;
+
+                if (CONFIG.autoLayoutSwitch) {
+                    // Set 15 Minute Interval (15 * 60 * 1000)
+                    layoutIntervalId = setInterval(() => {
+                        // Smooth Transition
+                        const wrapper = document.getElementById('content-wrapper');
+                        wrapper.classList.add('fade-out');
+
+                        setTimeout(() => {
+                            // Toggle Layout
+                            CONFIG.layout = (CONFIG.layout === 'v1') ? 'v2' : 'v1';
+                            applySettings(); // Re-apply UI
+
+                            // Fade In
+                            wrapper.classList.remove('fade-out');
+                        }, 500); // Wait for fade out
+                    }, 15 * 60 * 1000);
+                }
+            }
+
+            function applySettings() {
+                // Apply Layout
+                if (CONFIG.layout === 'v2') document.body.classList.add('layout-v2');
+                else document.body.classList.remove('layout-v2');
+
+                // Apply Theme
+                if (CONFIG.theme === 'dark') document.body.classList.add('theme-dark');
+                else document.body.classList.remove('theme-dark');
+
+                // Apply Background
+                if (CONFIG.layout === 'v2') {
+                    document.body.style.backgroundImage = 'none';
+                } else {
+                    if (CONFIG.bgUrl && CONFIG.bgUrl.trim() !== '') {
+                        // Use preloader to ensure image loads before applying
+                        preloadBgImage(CONFIG.bgUrl);
+                    } else {
+                        document.body.style.backgroundImage = 'none';
+                    }
+                }
+
+                // Handle Slideshow Logic
+                if (CONFIG.layout === 'v2') {
+                    updateInfoSection();
+                }
+
+                // Marquee
+                const marqueeEl = document.getElementById('marquee');
+                marqueeEl.textContent = CONFIG.marqueeText;
+                marqueeEl.style.animationDuration = CONFIG.marqueeSpeed + 's';
+
+                // Populate Inputs
+
+                // Populate City Select
+                const citySelect = document.getElementById('cfg-city');
+                citySelect.innerHTML = '';
+                for (const [key, data] of Object.entries(INDONESIAN_CITIES)) {
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.textContent = data.name;
+                    citySelect.appendChild(opt);
+                }
+                citySelect.value = CONFIG.cityId || 'solo';
+
+                checkCityInput(); // Toggle manual inputs
+                document.getElementById('cfg-lat').value = CONFIG.lat;
+                document.getElementById('cfg-lng').value = CONFIG.lng;
+                document.getElementById('cfg-tz').value = CONFIG.timeZone;
+
+                document.getElementById('cfg-theme').value = CONFIG.theme || 'light';
+                document.getElementById('cfg-layout').value = CONFIG.layout || 'v1';
+                document.getElementById('cfg-auto-layout').checked = CONFIG.autoLayoutSwitch;
+                document.getElementById('cfg-bg-url').value = CONFIG.bgUrl;
+                document.getElementById('cfg-sound-enabled').checked = CONFIG.soundEnabled;
+
+                document.getElementById('cfg-slideshow-enabled').checked = CONFIG.slideshowEnabled;
+                document.getElementById('cfg-slideshow-interval').value = CONFIG.slideshowInterval;
+                document.getElementById('cfg-slideshow-list').value = CONFIG.slideshowImages.join('\n');
+
+                document.getElementById('cfg-marquee').value = CONFIG.marqueeText;
+                document.getElementById('cfg-marquee-speed').value = CONFIG.marqueeSpeed || 20;
+                document.getElementById('cfg-hijri-offset').value = CONFIG.hijriOffset !== undefined ? CONFIG.hijriOffset : 1;
+                document.getElementById('cfg-iq-subuh').value = CONFIG.iqomahDurations.subuh;
+                document.getElementById('cfg-iq-dzuhur').value = CONFIG.iqomahDurations.dzuhur;
+                document.getElementById('cfg-iq-ashar').value = CONFIG.iqomahDurations.ashar;
+                document.getElementById('cfg-iq-maghrib').value = CONFIG.iqomahDurations.maghrib;
+                document.getElementById('cfg-iq-isya').value = CONFIG.iqomahDurations.isya;
+            }
+
+            function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+            function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
+
+            // State
+            let pTimes = {};
+            const prayerNames = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
+            const PT = new PrayTimes(CONFIG.method);
+
+            function checkCityInput() {
+                const val = document.getElementById('cfg-city').value;
+                const manualGroup = document.getElementById('manual-coords-group');
+                if (val === 'manual' || val === 'auto') {
+                    manualGroup.style.display = 'grid';
+                } else {
+                    manualGroup.style.display = 'none';
+                }
+            }
+
+            function getUserLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            CONFIG.lat = position.coords.latitude;
+                            CONFIG.lng = position.coords.longitude;
+                            CONFIG.cityId = 'auto';
+                            if (CONFIG.lng < 106) CONFIG.timeZone = 7;
+                            else if (CONFIG.lng < 120) CONFIG.timeZone = 8;
+                            else CONFIG.timeZone = 9;
+
+                            localStorage.setItem('masjidConfig', JSON.stringify(CONFIG));
+                            calculatePrayerTimes(); // Re-calc times
+                            updateClock(); // Force update
+
+                            // Visual feedback
+                            document.getElementById('cfg-lat').value = CONFIG.lat;
+                            document.getElementById('cfg-lng').value = CONFIG.lng;
+                            document.getElementById('cfg-tz').value = CONFIG.timeZone;
+
+                            alert("Lokasi berhasil dideteksi: " + CONFIG.lat.toFixed(4) + ", " + CONFIG.lng.toFixed(4));
+                        },
+                        (error) => {
+                            alert("Gagal mendeteksi lokasi: " + error.message + ". Silakan gunakan mode Manual.");
+                        }
+                    );
+                } else {
+                    alert("Browser tidak mendukung Geolocation.");
+                }
+            }
+
+            function testAdhan() {
+                closeSettings();
+                isSimulation = true;
+                setAppMode('ADHAN', { prayerName: 'subuh' });
+                playAlarm();
+            }
+
+            function testIqomah() {
+                closeSettings();
+                isSimulation = true;
+                // Test for 1 minute countdown
+                setAppMode('IQOMAH', { prayerName: 'subuh', ms: 60 * 1000 });
+                // Don't play alarm for Iqomah test unless requested, but typically Iqomah starts silently or with a beep? 
+                // Currently code plays alarm on transition to IQOMAH. Let's trigger it.
+                // playAlarm(); // Commented out to match real behavior
+
+                // Start a manual countdown for the simulation
+                const start = Date.now();
+                const totalMs = 60 * 1000;
+
+                const simInterval = setInterval(() => {
+                    if (!isSimulation) { clearInterval(simInterval); return; }
+
+                    const elapsed = Date.now() - start;
+                    const remaining = totalMs - elapsed;
+
+                    if (remaining <= 0) {
+                        clearInterval(simInterval);
+                        // Transition to SHOLAT phase for simulation
+                        setAppMode('SHOLAT', { prayerName: 'subuh' });
+                        playAlarm();
+
+                        // Optional: Auto-exit simulation after some time? 
+                        // For now let's keep it until user resets, or maybe 10 seconds.
+                        // Let's leave it to user to reset.
+                    } else {
+                        // Update iqomah timer text manually since main loop is blocked
+                        const totalSecs = Math.ceil(remaining / 1000);
+                        const mins = Math.floor(totalSecs / 60);
+                        const secs = totalSecs % 60;
+                        const el = document.getElementById('iqomah-timer');
+                        if (el) el.innerHTML = `<span style="margin-right:1rem;">−</span>${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                    }
+                }, 1000);
+            }
+
+            function init() {
+                loadSettings();
+                calculatePrayerTimes();
+                updateClock();
+                resetAutoLayoutTimer(); // Start timer if enabled
+                setInterval(updateClock, 1000);
+            }
+
+            function calculatePrayerTimes() {
+                const date = new Date();
+
+                // --- Static Times Logic for Solo ---
+                if (CONFIG.cityId === 'solo' && typeof JS_TIMES !== 'undefined') {
+                    const staticTimes = getStaticTimes(date);
+                    if (staticTimes) {
+                        // Apply Adjustment (Ihtiyati) to Static Times
+                        const adjustment = CONFIG.ihtiyati || 0;
+
+                        // Helper to add minutes
+                        const adjustTime = (timeStr, mins) => {
+                            if (!timeStr) return timeStr;
+                            const [h, m] = timeStr.split(':').map(Number);
+                            const d = new Date();
+                            d.setHours(h, m + mins, 0, 0);
+                            return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+                        };
+
+                        pTimes = {
+                            subuh: adjustTime(staticTimes.subuh, adjustment),
+                            syuruq: staticTimes.syuruq, // Syuruq tidak pakai ihtiyati
+                            dzuhur: adjustTime(staticTimes.dzuhur, adjustment),
+                            ashar: adjustTime(staticTimes.ashar, adjustment),
+                            maghrib: adjustTime(staticTimes.maghrib, adjustment),
+                            isya: adjustTime(staticTimes.isya, adjustment)
+                        };
+
+                        document.querySelector('#p-subuh .prayer-time').textContent = pTimes.subuh;
+                        if (document.querySelector('#p-syuruq .prayer-time')) document.querySelector('#p-syuruq .prayer-time').textContent = pTimes.syuruq || '-';
+                        document.querySelector('#p-dzuhur .prayer-time').textContent = pTimes.dzuhur;
+                        document.querySelector('#p-ashar .prayer-time').textContent = pTimes.ashar;
+                        document.querySelector('#p-maghrib .prayer-time').textContent = pTimes.maghrib;
+                        document.querySelector('#p-isya .prayer-time').textContent = pTimes.isya;
+
+                        return; // Exit, skip algorithmic calculation
+                    }
+                }
+
+                PT.tune({ fajr: CONFIG.ihtiyati, dhuhr: CONFIG.ihtiyati, asr: CONFIG.ihtiyati, maghrib: CONFIG.ihtiyati, isha: CONFIG.ihtiyati });
+                const times = PT.getTimes(date, [CONFIG.lat, CONFIG.lng], CONFIG.timeZone);
+                pTimes = {
+                    subuh: times.fajr,
+                    syuruq: times.sunrise,
+                    dzuhur: times.dhuhr,
+                    ashar: times.asr,
+                    maghrib: times.maghrib,
+                    isya: times.isha
+                };
+                document.querySelector('#p-subuh .prayer-time').textContent = times.fajr;
+                if (document.querySelector('#p-syuruq .prayer-time')) document.querySelector('#p-syuruq .prayer-time').textContent = times.sunrise || '-';
+                document.querySelector('#p-dzuhur .prayer-time').textContent = times.dhuhr;
+                document.querySelector('#p-ashar .prayer-time').textContent = times.asr;
+                document.querySelector('#p-maghrib .prayer-time').textContent = times.maghrib;
+                document.querySelector('#p-isya .prayer-time').textContent = times.isha;
+            }
+
+            function getStaticTimes(date) {
+                // Formatting date to MM-DD
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                const key = `${m}-${d}`;
+
+                // Search in JS_TIMES array
+                // Format: "MM-DD~~~~~Subuh|Sunrise|Dzuhur|Ashar|Maghrib|Isya"
+                for (let line of JS_TIMES) {
+                    if (line.startsWith(key)) {
+                        const parts = line.split('~~~~~');
+                        if (parts.length === 2) {
+                            const times = parts[1].split('|');
+                            // 0: Subuh, 1: Sunrise/Syuruq, 2: Dzuhur, 3: Ashar, 4: Maghrib, 5: Isya
+                            return {
+                                subuh: times[0],
+                                syuruq: times[1],
+                                dzuhur: times[2],
+                                ashar: times[3],
+                                maghrib: times[4],
+                                isya: times[5] ? times[5].trim() : times[5]
+                            };
+                        }
+                    }
+                }
+                return null;
+            }
+
+            function getHijriDate(date) {
+                const day = date.getDate();
+                const month = date.getMonth(); // 0-11
+                const year = date.getFullYear();
+
+                let m = month + 1;
+                let y = year;
+                if (m < 3) {
+                    y -= 1;
+                    m += 12;
+                }
+
+                let a = Math.floor(y / 100);
+                let b = 2 - a + Math.floor(a / 4);
+                if (y < 1583) b = 0;
+                if (y == 1582) {
+                    if (m > 10) b = -10;
+                    if (m == 10) {
+                        b = 0;
+                        if (day > 4) b = -10;
+                    }
+                }
+
+                const jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + b - 1524;
+
+                // Apply Manual Offset from Config
+                const adjustedJD = jd + (CONFIG.hijriOffset || 0);
+
+                b = 0;
+                if (adjustedJD > 2299160) {
+                    a = Math.floor((adjustedJD - 1867216.25) / 36524.25);
+                    b = 1 + a - Math.floor(a / 4);
+                }
+                const bb = adjustedJD + b + 1524;
+                let cc = Math.floor((bb - 122.1) / 365.25);
+                const dd = Math.floor(365.25 * cc);
+                const ee = Math.floor((bb - dd) / 30.6001);
+                const dayCe = (bb - dd) - Math.floor(30.6001 * ee);
+                let monthCe = ee - 1;
+                if (ee > 13) {
+                    cc += 1;
+                    monthCe = ee - 13;
+                }
+                const yearCe = cc - 4716;
+
+                const iYear = 10631. / 30.;
+                const epoch = 1948440;
+                const iShift = 8.01 / 60.;
+
+                let z = adjustedJD - epoch;
+                const cyc = Math.floor(z / 10631.);
+                z = z - 10631 * cyc;
+                const j = Math.floor((z - iShift) / iYear);
+                const iy = 30 * cyc + j;
+                const currentYear = iy + 1; // Fix: iy is elapsed years, so +1 for current
+                z = z - Math.floor(j * iYear + iShift);
+                let im = Math.floor((z + 28.5001) / 29.5);
+                if (im == 13) im = 12;
+                const id = z - Math.floor(29.5 * im - 29);
+
+                const months = ["Muharram", "Safar", "Rabi'ul Awal", "Rabi'ul Akhir", "Jumadil Awal", "Jumadil Akhir", "Rajab", "Sya'ban", "Ramadhan", "Syawal", "Dzulkaidan", "Dzulhijjah"];
+
+                return id + " " + months[im - 1] + " " + currentYear + " H";
+            }
+
+            function timeToDate(timeStr, now) {
+                if (!timeStr) return new Date(now);
+                const [h, m] = timeStr.split(':').map(Number);
+                const d = new Date(now);
+                d.setHours(h, m, 0, 0);
+                return d;
+            }
+
+            function updateClock() {
+                const now = new Date();
+                const h = String(now.getHours()).padStart(2, '0');
+                const m = String(now.getMinutes()).padStart(2, '0');
+                const s = String(now.getSeconds()).padStart(2, '0');
+                document.getElementById('clock').innerHTML = `<span>${h}:${m}</span><span class="small-sec">${s}</span>`;
+                document.getElementById('gregorian-date').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                document.getElementById('hijri-date').textContent = getHijriDate(now);
+
+                // Update Overlay Clocks
+                const clockText = `${h}:${m}:${s}`;
+                const adhanClock = document.getElementById('adhan-clock');
+                const iqomahClock = document.getElementById('iqomah-clock');
+                const sholatClock = document.getElementById('sholat-clock');
+                if (adhanClock) adhanClock.textContent = clockText;
+                if (iqomahClock) iqomahClock.textContent = clockText;
+                if (sholatClock) sholatClock.textContent = clockText;
+
+                checkPrayerState(now);
+            }
+
+            function checkPrayerState(now) {
+                if (isSimulation) return; // Don't override simulation state
+
+                const nowTime = now.getTime();
+
+                // --- Syuruq Check (20 menit setelah syuruq) ---
+                if (pTimes.syuruq) {
+                    const syuruqDate = timeToDate(pTimes.syuruq, now);
+                    const syuruqMs = syuruqDate.getTime();
+                    const syuruqDisplayMs = (CONFIG.syuruqDisplayMin || 20) * 60 * 1000;
+                    const syuruqEnds = syuruqMs + syuruqDisplayMs;
+                    if (nowTime >= syuruqMs && nowTime < syuruqEnds) {
+                        if (appMode !== 'SYURUQ') {
+                            setAppMode('SYURUQ', {});
+                        }
+                        return;
+                    }
+                }
+
+                let todaysPrayersObj = [];
+                prayerNames.forEach(name => {
+                    if (!pTimes[name]) return;
+                    const pDate = timeToDate(pTimes[name], now);
+                    todaysPrayersObj.push({ name: name, time: pDate, ms: pDate.getTime() });
+                });
+
+                // Active Phase Logic
+                let triggeredState = 'CLOCK';
+                let targetPrayerName = '';
+                let countdownMs = 0;
+
+                for (let p of todaysPrayersObj) {
+                    const adhanEnds = p.ms + (CONFIG.adhanDisplaySec * 1000);
+                    const iqomahDuration = (CONFIG.iqomahDurations[p.name] || 10) * 60 * 1000;
+                    const iqomahEnds = adhanEnds + iqomahDuration;
+                    const sholatDuration = 1 * 60 * 1000;
+                    const sholatEnds = iqomahEnds + sholatDuration;
+
+                    if (nowTime >= p.ms && nowTime < adhanEnds) {
+                        triggeredState = 'ADHAN';
+                        targetPrayerName = p.name;
+                        break;
+                    } else if (nowTime >= adhanEnds && nowTime < iqomahEnds) {
+                        triggeredState = 'IQOMAH';
+                        targetPrayerName = p.name;
+                        countdownMs = iqomahEnds - nowTime;
+                        break;
+                    } else if (nowTime >= iqomahEnds && nowTime < sholatEnds) {
+                        triggeredState = 'SHOLAT';
+                        targetPrayerName = p.name;
+                        break;
+                    }
+                }
+
+                // Next Prayer Logic (hanya 5 waktu shalat utama, skip syuruq)
+                let next = null;
+                let nextDiff = Infinity;
+                for (let p of todaysPrayersObj) {
+                    const diff = p.ms - nowTime;
+                    if (diff > 0 && diff < nextDiff) { next = p; nextDiff = diff; }
+                }
+
+                // If no next prayer (meaning it's past Isya), calculate tomorrow's Subuh
+                if (!next) {
+                    const tomorrow = new Date(now);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    const tTimes = PT.getTimes(tomorrow, [CONFIG.lat, CONFIG.lng], CONFIG.timeZone);
+
+                    const [h, m] = tTimes.fajr.split(':').map(Number);
+                    const subuhDate = new Date(tomorrow);
+                    subuhDate.setHours(h, m, 0, 0);
+
+                    next = { name: 'subuh', time: subuhDate, ms: subuhDate.getTime() };
+                    nextDiff = next.ms - nowTime;
+                }
+
+                // --- State Transition Logic ---
+                if (triggeredState === 'ADHAN' && appMode !== 'ADHAN') {
+                    playAlarm();
+                } else if (triggeredState === 'IQOMAH' && appMode !== 'IQOMAH') {
+                    playAlarm();
+                } else if (triggeredState === 'SHOLAT' && appMode !== 'SHOLAT') {
+                    playAlarm();
+                }
+
+                // Apply State
+                if (triggeredState === 'ADHAN') {
+                    setAppMode('ADHAN', { prayerName: targetPrayerName });
+                } else if (triggeredState === 'IQOMAH') {
+                    if (appMode !== 'IQOMAH') {
+                        setAppMode('IQOMAH', { prayerName: targetPrayerName, ms: countdownMs });
+                    } else {
+                        // Just update the countdown display every tick
+                        updateIqomahTimer(countdownMs);
+                    }
+                } else if (triggeredState === 'SHOLAT') {
+                    setAppMode('SHOLAT', { prayerName: targetPrayerName });
+                } else {
+                    setAppMode('CLOCK');
+                    updateCountdown(next, nextDiff);
+                }
+
+                if (triggeredState !== 'CLOCK') highlightPrayer(targetPrayerName);
+                else highlightPrayer(null);
+            }
+
+            function updateIqomahTimer(ms) {
+                const totalSecs = Math.max(0, Math.ceil(ms / 1000));
+                const mins = Math.floor(totalSecs / 60);
+                const secs = totalSecs % 60;
+                const el = document.getElementById('iqomah-timer');
+                if (el) el.innerHTML = `<span style="margin-right:1rem;">−</span>${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }
+
+            function setAppMode(mode, data) {
+                appMode = mode;
+                const adhanOverlay = document.getElementById('adhan-overlay');
+                const iqomahOverlay = document.getElementById('iqomah-overlay');
+                const sholatOverlay = document.getElementById('sholat-overlay');
+                const syuruqOverlay = document.getElementById('syuruq-overlay');
+
+                adhanOverlay.classList.remove('active');
+                iqomahOverlay.classList.remove('active');
+                if (sholatOverlay) sholatOverlay.classList.remove('active');
+                if (syuruqOverlay) syuruqOverlay.classList.remove('active');
+
+                if (mode === 'ADHAN') {
+                    adhanOverlay.classList.add('active');
+                    const name = data.prayerName;
+                    const formatted = name.charAt(0).toUpperCase() + name.slice(1);
+                    document.getElementById('adhan-name-display').textContent = formatted;
+                } else if (mode === 'IQOMAH') {
+                    iqomahOverlay.classList.add('active');
+                    updateIqomahTimer(data.ms);
+                } else if (mode === 'SHOLAT') {
+                    if (sholatOverlay) sholatOverlay.classList.add('active');
+                } else if (mode === 'SYURUQ') {
+                    if (syuruqOverlay) syuruqOverlay.classList.add('active');
+                } else {
+                    // Mode CLOCK: kembalikan background image v1 jika hilang
+                    if (CONFIG.layout !== 'v2' && CONFIG.bgUrl && CONFIG.bgUrl.trim() !== '') {
+                        const currentBg = document.body.style.backgroundImage;
+                        if (!currentBg || currentBg === 'none' || currentBg === '') {
+                            preloadBgImage(CONFIG.bgUrl);
+                        }
+                    }
+                }
+            }
+
+            function updateCountdown(next, diff) {
+                const wrapper = document.getElementById('countdown-wrapper');
+                if (!next) {
+                    wrapper.textContent = "Menuju Subuh Esok";
+                    wrapper.classList.remove('large-subuh');
+                    return;
+                }
+                const diffSecs = Math.floor(diff / 1000);
+                const hrs = Math.floor(diffSecs / 3600);
+                const mins = Math.floor((diffSecs % 3600) / 60);
+                const secs = diffSecs % 60;
+                wrapper.textContent = `Menuju ${next.name.charAt(0).toUpperCase() + next.name.slice(1)}: -${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+                // Remove special subuh styling per user request
+                wrapper.classList.remove('large-subuh');
+            }
+
+            function highlightPrayer(name) {
+                document.querySelectorAll('.prayer-item').forEach(el => el.classList.remove('active'));
+                if (name) {
+                    const el = document.getElementById('p-' + name);
+                    if (el) el.classList.add('active');
+                }
+            }
+
+            // Beep menggunakan Web Audio API (fallback untuk STB yang block autoplay)
+            function playBeepFallback() {
+                try {
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 1.5);
+                } catch (e) { console.warn('Web Audio fallback failed:', e); }
+            }
+
+            function playAlarm() {
+                if (!CONFIG.soundEnabled) return;
+                alarmRunId++;
+                const myRunId = alarmRunId;
+                const audio = document.getElementById('alarm-sound');
+                if (audio) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    const playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise
+                            .then(() => { /* success */ })
+                            .catch(e => {
+                                if (myRunId === alarmRunId) {
+                                    console.warn('Audio blocked, using Web Audio fallback:', e);
+                                    playBeepFallback();
+                                }
+                            });
+                    } else {
+                        // Old browser: no promise returned, try fallback anyway
+                        setTimeout(function () { playBeepFallback(); }, 100);
+                    }
+                } else {
+                    playBeepFallback();
+                }
+            }
+
+            // --- Slideshow Functions ---
+            function updateInfoSection() {
+                const container = document.getElementById('info-card-content');
+                if (!container) return;
+
+                // Stop any running interval first
+                stopSlideshow();
+
+                // Clear current content
+                container.innerHTML = '';
+
+                if (CONFIG.slideshowEnabled && CONFIG.slideshowImages.length > 0) {
+                    // Render Slideshow
+                    container.style.padding = '0'; // Remove padding for images
+                    container.style.backgroundColor = '#000'; // Black background for better contrast
+
+                    const slideWrapper = document.createElement('div');
+                    slideWrapper.id = 'slideshow-container';
+                    // Ensure container handles relative positioning for absolute children
+                    slideWrapper.style.position = 'relative';
+                    slideWrapper.style.width = '100%';
+                    slideWrapper.style.height = '100%';
+
+                    // Preload and Filter Images
+                    let validImages = [];
+                    let loadedCount = 0;
+
+                    // Message if no images load
+                    const msgEl = document.createElement('div');
+                    msgEl.style.color = '#fff';
+                    msgEl.style.padding = '2rem';
+                    msgEl.style.textAlign = 'center';
+                    msgEl.innerText = 'Memuat Slideshow...';
+                    msgEl.id = 'slideshow-msg';
+                    slideWrapper.appendChild(msgEl);
+                    container.appendChild(slideWrapper);
+
+                    CONFIG.slideshowImages.forEach((src, idx) => {
+                        const img = new Image();
+                        img.src = src;
+                        img.className = 'slide-img';
+
+                        img.onload = () => {
+                            // Image loaded successfully
+                            slideWrapper.appendChild(img);
+                            validImages.push(img);
+
+                            // If this is the first one ready, show it immediately? 
+                            // Or wait for startSlideshow logic.
+                            if (validImages.length === 1) {
+                                // Remove loading message
+                                const msg = document.getElementById('slideshow-msg');
+                                if (msg) msg.remove();
+
+                                img.classList.add('active');
+                            }
+                            // Start rotation if we have at least 2
+                            if (validImages.length === 2 && !slideIntervalId) {
+                                startSlideshow();
+                            }
+                        };
+
+                        img.onerror = () => {
+                            console.warn(`Gagal memuat gambar slideshow: ${src}`);
+                            // If all fail
+                            /* 
+                            if (idx === CONFIG.slideshowImages.length - 1 && validImages.length === 0) {
+                                if (msgEl) msgEl.innerText = 'Tidak ada gambar yang dapat dimuat.';
+                            }
+                            */
+                        };
+                    });
+
+                } else {
+                    // Render Default Imam Grid
+                    container.style.padding = '2rem'; // Restore padding
+                    container.innerHTML = `
+                <div class="imam-grid-container">
+                    <div class="info-title">Jadwal Imam Hari Ini</div>
+                    <div class="imam-grid">
+                        <div class="imam-item"><div class="imam-label">Subuh</div><div class="imam-name">Ust. Abdullah</div></div>
+                        <div class="imam-item"><div class="imam-label">Dzuhur</div><div class="imam-name">Ust. Hasan</div></div>
+                        <div class="imam-item"><div class="imam-label">Ashar</div><div class="imam-name">Ust. Fatkhur</div></div>
+                        <div class="imam-item"><div class="imam-label">Maghrib</div><div class="imam-name">Ust. M. Rais</div></div>
+                        <div class="imam-item" style="grid-column: span 2;"><div class="imam-label">Isya</div><div class="imam-name">Ust. H. Zainuddin</div></div>
+                    </div>
+                </div>`;
+                }
+            }
+
+            function startSlideshow() {
+                stopSlideshow(); // clear existing
+
+                // Get only images that are actually in the DOM (successfully loaded)
+                const images = document.querySelectorAll('.slide-img');
+                if (images.length <= 1) return; // No need to cycle
+
+                // Find currently active index or start at 0
+                let activeIdx = 0;
+                images.forEach((img, idx) => {
+                    if (img.classList.contains('active')) activeIdx = idx;
+                });
+                currentSlideIndex = activeIdx;
+
+                slideIntervalId = setInterval(() => {
+                    const currentImages = document.querySelectorAll('.slide-img');
+                    if (currentImages.length < 2) return;
+
+                    // Cari slide berikutnya yang sudah terload
+                    let tries = 0;
+                    let nextIndex = (currentSlideIndex + 1) % currentImages.length;
+                    while (tries < currentImages.length) {
+                        const nextImg = currentImages[nextIndex];
+                        if (nextImg.complete && nextImg.naturalWidth > 0) break;
+                        nextIndex = (nextIndex + 1) % currentImages.length;
+                        tries++;
+                    }
+
+                    currentImages[currentSlideIndex].classList.remove('active');
+                    currentSlideIndex = nextIndex;
+                    currentImages[currentSlideIndex].classList.add('active');
+
+                }, CONFIG.slideshowInterval * 60 * 1000); // Minutes to ms
+            }
+
+            function stopSlideshow() {
+                if (slideIntervalId) clearInterval(slideIntervalId);
+                slideIntervalId = null;
+            }
+
+            // --- Full Screen & Wake Lock ---
+            // --- Full Screen & Wake Lock ---
+            async function toggleFullScreen() {
+                const doc = window.document;
+                const docEl = doc.documentElement;
+
+                const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+                const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+                if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+                    if (requestFullScreen) {
+                        try {
+                            await requestFullScreen.call(docEl);
+                            requestWakeLock(); // Request Wake Lock when entering FS
+                        } catch (err) {
+                            console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                            alert(`Gagal masuk mode layar penuh: ${err.message}`);
+                        }
+                    } else {
+                        alert("Fitur Full Screen tidak didukung browser ini.");
+                    }
+                } else {
+                    if (cancelFullScreen) {
+                        cancelFullScreen.call(doc);
+                    }
+                }
+            }
+
+            async function requestWakeLock() {
+                try {
+                    if ('wakeLock' in navigator) {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                        wakeLock.addEventListener('release', () => {
+                            console.log('Wake Lock was released');
+                        });
+                        console.log('Wake Lock is active');
+                    }
+                } catch (err) {
+                    console.error(`${err.name}, ${err.message}`);
+                }
+            }
+
+            // Re-acquire Wake Lock when visibility changes (e.g. switch back to tab)
+            document.addEventListener('visibilitychange', async () => {
+                if (wakeLock !== null && document.visibilityState === 'visible') {
+                    requestWakeLock();
+                }
+            });
+
+            // Update overlay clocks for Syuruq overlay
+            const origUpdateClock = updateClock;
+            (function patchUpdateClock() {
+                const _orig = updateClock;
+                updateClock = function () {
+                    _orig();
+                    const now = new Date();
+                    const h = String(now.getHours()).padStart(2, '0');
+                    const m = String(now.getMinutes()).padStart(2, '0');
+                    const s = String(now.getSeconds()).padStart(2, '0');
+                    const clockText = h + ':' + m + ':' + s;
+                    const sc = document.getElementById('syuruq-clock');
+                    if (sc) sc.textContent = clockText;
+                };
+            })();
+
+            init();
+        </script>
+</body>
+
+</html>
